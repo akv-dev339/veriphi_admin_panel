@@ -1,0 +1,36 @@
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 16px 24px;
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.admin-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+.log_btn{
+    background: rgb(245, 65, 65);
+    font-weight: 500;
+    color: white;
+    padding: 2px;
+    border-radius: 10px;
+}
