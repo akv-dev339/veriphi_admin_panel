@@ -12,11 +12,13 @@ import CorporateRequests from './pages/CorporateRequests';
 import RemoveEvent from './pages/RemoveEvents';
 import AdminLayout from './components/adminlayout';
 import { EventProvider } from './context/EventContext';
+import { CorporateProvider } from './context/CorporateContext';
 
 function App() {
   return (
     <Router>
       <EventProvider>
+        <CorporateProvider>
       <ToastContainer />
       <Routes>
         <Route path='/' element={<Login/>}></Route>
@@ -27,10 +29,11 @@ function App() {
           <Route path="approved-events" element={<ApprovedEvents />} />
           <Route path="add-event" element={<AddEvent />} />
           <Route path="corporate-requests" element={<CorporateRequests />} />
-          <Route path="remove-event" element={<RemoveEvent />} />
+          
         </Route>
 
       </Routes>
+        </CorporateProvider>
       </EventProvider>
     </Router>
   );

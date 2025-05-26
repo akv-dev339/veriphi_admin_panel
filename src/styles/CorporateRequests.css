@@ -1,0 +1,71 @@
+.corporate-requests-container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.request-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.request-card {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.status {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.status.pending {
+  color: orange;
+}
+
+.status.approved {
+  color: green;
+}
+
+.status.rejected {
+  color: red;
+}
+
+.status.on_verification {
+  color: #ff9800;
+}
+
+button {
+  margin-top: 0.8rem;
+  margin-right: 1rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.verify-btn {
+  background-color: #ff9800;
+  color: white;
+}
+
+.approve-btn {
+  background-color: green;
+  color: white;
+}
+
+.reject-btn {
+  background-color: crimson;
+  color: white;
+}
+
+.verification-note {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  color: #ff9800;
+}

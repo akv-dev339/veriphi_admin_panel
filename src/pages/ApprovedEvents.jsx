@@ -74,7 +74,7 @@ const ApprovedEvents = () => {
             ) : (
               <div className="event-card" key={event.id}>
                 <h3>{event.title}</h3>
-                <p><strong>Type:</strong> {event.category}</p>
+                <p><strong>Category:</strong> {event.category}</p>
                 <p><strong>Date:</strong> {event.date}</p>
                 <p>{event.description}</p>
                 <div className="card-actions">
