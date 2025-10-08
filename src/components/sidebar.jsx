@@ -10,7 +10,7 @@ const sidebar = () => {
       <NavLink to={'/admin/dashboard'} activeClassName='active'>Dashboard</NavLink>
       <NavLink to={'/admin/approve-event'} activeClassName='active'>Approval Request</NavLink>
       <NavLink to={'/admin/approved-events'} activeClassName='active'>Approved Events</NavLink>
-      <NavLink to="/admin/corporate-requests" activeClassName="active">Corporate Requests</NavLink>
+      <NavLink to="/admin/bulk-requests" activeClassName="active">Bulk Requests</NavLink>
       <NavLink to="/admin/add-event" activeClassName="active">Add/Published Event</NavLink>
       </nav>
      

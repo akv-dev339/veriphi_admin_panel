@@ -8,17 +8,17 @@ import Dashboard from './pages/Dashboard';
 import ApproveEvent from './pages/ApproveEvents';
 import ApprovedEvents from './pages/ApprovedEvents';
 import AddEvent from './pages/AddEvents';
-import CorporateRequests from './pages/CorporateRequests';
 import RemoveEvent from './pages/RemoveEvents';
 import AdminLayout from './components/adminlayout';
 import { EventProvider } from './context/EventContext';
-import { CorporateProvider } from './context/CorporateContext';
+
+import BulkRequestsPage from './pages/BulkRequestsPage';
 
 function App() {
   return (
     <Router>
       <EventProvider>
-        <CorporateProvider>
+        
       <ToastContainer />
       <Routes>
         <Route path='/' element={<Login/>}></Route>
@@ -28,12 +28,12 @@ function App() {
           <Route path="approve-event" element={<ApproveEvent />} />
           <Route path="approved-events" element={<ApprovedEvents />} />
           <Route path="add-event" element={<AddEvent />} />
-          <Route path="corporate-requests" element={<CorporateRequests />} />
+          <Route path="bulk-requests" element={<BulkRequestsPage />} />
           
         </Route>
 
       </Routes>
-        </CorporateProvider>
+       
       </EventProvider>
     </Router>
   );
