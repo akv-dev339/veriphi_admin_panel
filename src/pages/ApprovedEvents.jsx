@@ -100,71 +100,106 @@ import React, { useEffect, useState } from "react";
 import "../styles/ApprovedEvents.css";
 const API_BASE = process.env.REACT_APP_API_URL;
 
-
 const ApprovedEvents = () => {
   const [events, setEvents] = useState([]);
   const [editId, setEditId] = useState(null);
-  const [formData, setFormData] = useState({ name:"", description:"", category:"", artist:"" });
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    category: "",
+    artist: "",
+  });
 
   useEffect(() => {
     fetch(`${API_BASE}/event/list?approved=true`)
-      .then(res => res.json())
-      .then(data => setEvents(data))
-      .catch(err => console.error(err));
+      .then((res) => res.json())
+      .then((data) => setEvents(data))
+      .catch((err) => console.error(err));
   }, []);
 
   const handleEditClick = (event) => {
     setEditId(event.eventId);
-    setFormData({...event});
+    setFormData({ ...event });
   };
 
   const handleSaveClick = async () => {
     try {
-      const res = await fetch(`${API_BASE}/update`, {
-        method:"POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(formData)
+      const res = await fetch(`${API_BASE}/event/update`, {
+        method: "PUT", // ✅ correct verb
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-      const data = await res.json();
-      setEvents(events.map(e => e.eventId === editId ? data : e));
-      setEditId(null);
-    } catch(err){ console.error(err); }
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(events.map((e) => (e.eventId === editId ? data : e)));
+        setEditId(null);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleRemove = async (id) => {
     try {
-      await fetch(`${API_BASE}/delete?eventId=${id}`, { method:"POST" });
-      setEvents(events.filter(e => e.eventId !== id));
-    } catch(err){ console.error(err); }
+      const res = await fetch(`${API_BASE}/event/delete?eventId=${id}`, {
+        method: "DELETE", // ✅ correct verb
+      });
+      if (res.ok) {
+        setEvents(events.filter((e) => e.eventId !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
     <div className="approved-events-container">
       <h2>Approved Events</h2>
-      {events.length === 0 ? (<p>No approved events.</p>) :
-        events.map(event => editId === event.eventId ? (
-          <div key={event.eventId} className="event-card">
-            <input value={formData.name} onChange={e=>setFormData({...formData, name:e.target.value})} />
-            <input value={formData.category} onChange={e=>setFormData({...formData, category:e.target.value})} />
-            <input value={formData.artist} onChange={e=>setFormData({...formData, artist:e.target.value})} />
-            <textarea value={formData.description} onChange={e=>setFormData({...formData, description:e.target.value})} />
-            <button onClick={handleSaveClick}>Save</button>
-          </div>
-        ) : (
-          <div key={event.eventId} className="event-card">
-            <h3>{event.name}</h3>
-            <p><strong>Category:</strong> {event.category}</p>
-            <p><strong>Artist:</strong> {event.artist}</p>
-            <p>{event.description}</p>
-            <div className="card-actions">
-              <button onClick={()=>handleEditClick(event)}>Edit</button>
-              <button onClick={()=>handleRemove(event.eventId)}>Remove</button>
+      {events.length === 0 ? (
+        <p>No approved events.</p>
+      ) : (
+        events.map((event) =>
+          editId === event.eventId ? (
+            <div key={event.eventId} className="event-card">
+              <input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Name"
+              />
+              <input
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                placeholder="Category"
+              />
+              <input
+                value={formData.artist}
+                onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
+                placeholder="Artist"
+              />
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Description"
+              />
+              <button onClick={handleSaveClick}>Save</button>
             </div>
-          </div>
-        ))
-      }
+          ) : (
+            <div key={event.eventId} className="event-card">
+              <h3>{event.name}</h3>
+              <p><strong>Category:</strong> {event.category}</p>
+              <p><strong>Artist:</strong> {event.artist}</p>
+              <p>{event.description}</p>
+              <div className="card-actions">
+                <button onClick={() => handleEditClick(event)}>Edit</button>
+                <button onClick={() => handleRemove(event.eventId)}>Remove</button>
+              </div>
+            </div>
+          )
+        )
+      )}
     </div>
   );
 };
 
 export default ApprovedEvents;
+

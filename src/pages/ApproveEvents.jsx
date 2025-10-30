@@ -187,53 +187,69 @@
 // export default ApproveEvent;
 
 
-import React, { useEffect, useState } from 'react';
-import '../styles/ApproveEvents.css';
+import React, { useEffect, useState } from "react";
+import "../styles/ApproveEvents.css";
 const API_BASE = process.env.REACT_APP_API_URL;
 
-const ApproveEvent = () => {
+const ApproveEvents = () => {
   const [pendingEvents, setPendingEvents] = useState([]);
 
   useEffect(() => {
     fetch(`${API_BASE}/event/list?approved=false`)
-      .then(res => res.json())
-      .then(data => setPendingEvents(data))
-      .catch(err => console.error(err));
+      .then((res) => res.json())
+      .then((data) => setPendingEvents(data))
+      .catch((err) => console.error(err));
   }, []);
 
   const handleApprove = async (event) => {
     try {
-      await fetch(`${API_BASE}/event/updateApproval?eventId=${event.eventId}&status=true`, { method:"POST" });
-      setPendingEvents(pendingEvents.filter(e => e.eventId !== event.eventId));
-    } catch(err){ console.error(err); }
+      const response = await fetch(
+        `${API_BASE}/event/updateApproval?eventId=${event.eventId}&status=true`,
+        { method: "PUT" } // ✅ correct HTTP verb
+      );
+      if (response.ok) {
+        setPendingEvents(pendingEvents.filter((e) => e.eventId !== event.eventId));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleReject = async (id) => {
     try {
-      await fetch(`${API_BASE}/event/delete?eventId=${id}`, { method:"POST" });
-      setPendingEvents(pendingEvents.filter(e => e.eventId !== id));
-    } catch(err){ console.error(err); }
+      const response = await fetch(`${API_BASE}/event/delete?eventId=${id}`, {
+        method: "DELETE", // ✅ correct HTTP verb
+      });
+      if (response.ok) {
+        setPendingEvents(pendingEvents.filter((e) => e.eventId !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
     <div className="approve_event">
       <h2>Pending Event Approvals</h2>
-      {pendingEvents.length === 0 ? (<p>No pending events to approve.</p>) :
-        pendingEvents.map(event => (
+      {pendingEvents.length === 0 ? (
+        <p>No pending events to approve.</p>
+      ) : (
+        pendingEvents.map((event) => (
           <div className="event_card" key={event.eventId}>
             <h3>{event.name}</h3>
             <p><strong>Category:</strong> {event.category}</p>
             <p><strong>Artist:</strong> {event.artist}</p>
             <p>{event.description}</p>
             <div className="buttonss">
-              <button onClick={()=>handleApprove(event)}>Approve</button>
-              <button onClick={()=>handleReject(event.eventId)}>Reject</button>
+              <button onClick={() => handleApprove(event)}>Approve</button>
+              <button onClick={() => handleReject(event.eventId)}>Reject</button>
             </div>
           </div>
         ))
-      }
+      )}
     </div>
   );
 };
 
-export default ApproveEvent;
+export default ApproveEvents;
+
