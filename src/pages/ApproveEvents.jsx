@@ -203,14 +203,14 @@ const ApproveEvent = () => {
 
   const handleApprove = async (event) => {
     try {
-      await fetch(`${API_BASE}/updateApproval?eventId=${event.eventId}&status=true`, { method:"POST" });
+      await fetch(`${API_BASE}/event/updateApproval?eventId=${event.eventId}&status=true`, { method:"POST" });
       setPendingEvents(pendingEvents.filter(e => e.eventId !== event.eventId));
     } catch(err){ console.error(err); }
   };
 
   const handleReject = async (id) => {
     try {
-      await fetch(`${API_BASE}/delete?eventId=${id}`, { method:"POST" });
+      await fetch(`${API_BASE}/event/delete?eventId=${id}`, { method:"POST" });
       setPendingEvents(pendingEvents.filter(e => e.eventId !== id));
     } catch(err){ console.error(err); }
   };
