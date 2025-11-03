@@ -1,54 +1,65 @@
-import React, { useEffect, useState } from 'react';
-import '../styles/bulkRequests.css';
+import React, { useEffect, useState } from "react";
+import "../styles/bulkRequests.css";
 
 const BulkRequestsPage = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  // ✅ Live backend URL
+  const API_URL = "https://veriphi-backend.onrender.com";
+  const toProperCase = (str) => {
+    if (!str) return '';
+    const lower = str.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  };
 
-  // ✅ Fetch all pending/rejected requests
+  // ✅ Fetch all bulk bookings
   const fetchRequests = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/booking/getGrpPendingOrRejectByEmail`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify('admin@veriphi.com'), // placeholder email if API expects one
+      const response = await fetch(`${API_URL}/booking/getAllGroupPending`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
       });
 
       if (response.ok) {
         const data = await response.json();
-        setRequests(data);
+        console.log("✅ Bulk Booking Data:", data);
+        setRequests(data || []);
       } else {
-        console.error('Failed to fetch bulk requests');
+        console.error("❌ Failed to fetch bulk requests:", response.status);
       }
     } catch (error) {
-      console.error('Error fetching bulk requests:', error);
+      console.error("🚨 Error fetching bulk requests:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Approve or Reject a request
+  // ✅ Handle Approve / Reject actions
   const handleDecision = async (bookingId, decision) => {
     const confirmed = window.confirm(`Are you sure you want to ${decision} this booking?`);
     if (!confirmed) return;
 
+    const approvalValue = toProperCase(decision); // APPROVED or REJECTED
+    console.log(`➡ Updating booking ${bookingId} with status: ${approvalValue}`);
+
     try {
       const response = await fetch(
-        `${API_URL}/booking/updateGroupApproval?bookingId=${bookingId}&approval=${decision}`,
-        { method: 'PUT' }
+        `${API_URL}/booking/updateGroupApproval?bookingId=${bookingId}&approval=${approvalValue}`,
+        { method: "PUT" }
       );
 
       if (response.ok) {
         alert(`Booking ${decision} successfully!`);
-        fetchRequests(); // refresh the list
+        fetchRequests(); // Refresh the list
       } else {
-        alert('Failed to update booking status.');
+        const errorText = await response.text();
+        console.error(`❌ Failed to update booking. Status: ${response.status}`, errorText);
+        alert("Failed to update booking status. Check console for details.");
       }
     } catch (error) {
-      console.error('Error updating booking:', error);
+      console.error("🚨 Network/CORS error while updating booking:", error);
     }
   };
 
@@ -57,67 +68,78 @@ const BulkRequestsPage = () => {
   }, []);
 
   if (loading) {
-    return <div className="bulk-loader">Loading requests...</div>;
+    return <div className="loading">Loading bulk requests...</div>;
+  }
+
+  if (requests.length === 0) {
+    return <div className="no-data">No bulk booking requests found.</div>;
   }
 
   return (
-    <div className="bulk-container">
+    <div className="bulk-requests-container">
       <h2>Bulk Booking Requests</h2>
-      {requests.length === 0 ? (
-        <p>No pending or rejected requests.</p>
-      ) : (
-        <table className="bulk-table">
-          <thead>
-            <tr>
-              <th>Booking ID</th>
-              <th>User Email</th>
-              <th>Event ID</th>
-              <th>Venue ID</th>
-              <th>Date</th>
-              <th>Start Time</th>
-              <th>Seat Category ID</th>
-              <th>No. of Seats</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((req) => (
-              <tr key={req.bookingId}>
-                <td>{req.bookingId}</td>
+      <table className="bulk-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Entity Name</th>
+            <th>User Email</th>
+            <th>Booking Date</th>
+            <th>Event Name</th>
+            <th>Event Date</th>
+            <th>Event Time</th>
+            <th>Venue</th>
+            <th>Seat Category</th>
+            <th>Tickets</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map((req, index) => {
+            const status = req.bookingStatus?.toLowerCase() || "pending";
+            const isPending = !["approved", "rejected"].includes(status);
+
+            return (
+              <tr key={index}>
+                <td>{req.groupBookingId}</td>
+                <td>{req.entityName}</td>
                 <td>{req.userEmail}</td>
-                <td>{req.eventId}</td>
-                <td>{req.venueId}</td>
-                <td>{req.date}</td>
-                <td>{req.startTime}</td>
-                <td>{req.seatCategoryId}</td>
-                <td>{req.numberOfSeats}</td>
-                <td className={`status-${req.approvalStatus?.toLowerCase()}`}>
-                  {req.approvalStatus}
-                </td>
+                <td>{new Date(req.bookingDate).toLocaleString()}</td>
+                <td>{req.eventName}</td>
+                <td>{req.eventDate}</td>
+                <td>{req.eventTime}</td>
+                <td>{req.venue}</td>
+                <td>{req.seatCategory}</td>
+                <td>{req.numberOfTickets}</td>
+                <td className={`status-${status}`}>{req.bookingStatus}</td>
                 <td>
-                  {req.approvalStatus === 'PENDING' && (
-                    <>
+                  {isPending ? (
+                    <div className="action-buttons">
                       <button
                         className="approve-btn"
-                        onClick={() => handleDecision(req.bookingId, 'approved')}
+                        onClick={() => handleDecision(req.groupBookingId, "approved")}
                       >
-                        Approve
+                        ✅ Approve
                       </button>
                       <button
                         className="reject-btn"
-                        onClick={() => handleDecision(req.bookingId, 'rejected')}
+                        onClick={() => handleDecision(req.groupBookingId, "rejected")}
                       >
-                        Reject
+                        ❌ Reject
                       </button>
-                    </>
+                    </div>
+                  ) : (
+                    <span className={`action-status-${status}`}>
+                      {req.bookingStatus?.toUpperCase()}
+                    </span>
                   )}
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 };
